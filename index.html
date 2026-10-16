@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Six Seven Pizza Menu</title>
+    <style>
+        :root {
+            --primary-color: #ff4757;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 50px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .category-btn {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--text-color);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn.active, .category-btn:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .menu-item {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-details h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+        }
+
+        .item-details p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .item-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Six Seven Pizza</h1>
+        <p>Daily Updated Menu</p>
+    </header>
+
+    <div class="categories" id="category-buttons">
+    </div>
+
+    <div class="menu-container" id="menu-container">
+    </div>
+
+    <script>
+        const menuData = [
+            { id: 1, name: "Margherita Pizza", desc: "Tomato sauce, fresh mozzarella, basil", price: "15 LYD", category: "Pizza" },
+            { id: 2, name: "Pepperoni Pizza", desc: "Beef pepperoni, mozzarella, special sauce", price: "22 LYD", category: "Pizza" },
+            { id: 3, name: "BBQ Chicken Pizza", desc: "Grilled chicken, onions, BBQ sauce", price: "25 LYD", category: "Pizza" },
+            { id: 4, name: "Chicken Wings (6 pcs)", desc: "Crispy wings with Buffalo sauce", price: "12 LYD", category: "Appetizers" },
+            { id: 5, name: "Cheese Fries", desc: "Crispy fries topped with melted cheddar", price: "10 LYD", category: "Appetizers" },
+            { id: 6, name: "Strawberry Mojito", desc: "Refreshing strawberry and mint drink", price: "8 LYD", category: "Beverages" },
+            { id: 7, name: "Coca Cola", desc: "330ml Can", price: "3 LYD", category: "Beverages" }
+        ];
+
+        const categories = ["All", ...new Set(menuData.map(item => item.category))];
+        const categoryContainer = document.getElementById('category-buttons');
+        const menuContainer = document.getElementById('menu-container');
+
+        categories.forEach((cat, index) => {
+            const btn = document.createElement('button');
+            btn.className = `category-btn ${index === 0 ? 'active' : ''}`;
+            btn.innerText = cat;
+            btn.onclick = () => filterMenu(cat, btn);
+            categoryContainer.appendChild(btn);
+        });
+
+        function displayMenu(items) {
+            menuContainer.innerHTML = '';
+            items.forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.innerHTML = `
+                    <div class="item-details">
+                        <h3>${item.name}</h3>
+                        <p>${item.desc}</p>
+                    </div>
+                    <div class="item-price">${item.price}</div>
+                `;
+                menuContainer.appendChild(menuItem);
+            });
+        }
+
+        function filterMenu(category, clickedBtn) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+
+            if (category === "All") {
+                displayMenu(menuData);
+            } else {
+                const filtered = menuData.filter(item => item.category === category);
+                displayMenu(filtered);
+            }
+        }
+
+        displayMenu(menuData);
+    </script>
+</body>
+</html>
